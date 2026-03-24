@@ -1,1 +1,1 @@
-# kaleido-typography-explorer
+# kaleido-type-explorer
