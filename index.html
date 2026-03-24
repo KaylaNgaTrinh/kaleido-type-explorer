@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaleido Typography Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Josefin+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* === PAGE === */
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a202c;}
+body.dark{background:#0f1118;}
+.page-wrap{max-width:960px;margin:40px auto;padding:0 24px 80px;}
+.page-title{font-size:22px;font-weight:700;color:#1a202c;margin-bottom:4px;}
+.page-sub{font-size:14px;color:#718096;margin-bottom:28px;}
+body.dark .page-title{color:#f7fafc;}
+body.dark .page-sub{color:#a0aec0;}
+
+/* === EMBED MODE === */
+body.embed-mode{background:#fff;}
+body.dark.embed-mode{background:#1a1a2e;}
+body.embed-mode .page-wrap{max-width:100%;margin:0;padding:0;}
+body.embed-mode .page-title,body.embed-mode .page-sub{display:none;}
+body.embed-mode #kte{border-radius:0;border-left:none;border-right:none;border-top:none;}
+
+/* === SHELL === */
+#kte{background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:visible;}
+body.dark #kte{background:#1a1a2e;border-color:rgba(255,255,255,.08);}
+
+/* === HEADER (matches color explorer exactly) === */
+.kte-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;border-bottom:1px solid #e2e8f0;gap:10px;
+  border-radius:16px 16px 0 0;background:#fff;
+  position:sticky;top:0;z-index:20;flex-wrap:wrap;
+}
+body.dark .kte-header{background:#1a1a2e;border-color:rgba(255,255,255,.08);}
+.kte-header-left {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.kte-header-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+
+/* === BRAND DROPDOWN (exact match to color explorer) === */
+.kte-dd{position:relative;}
+.kte-dd-btn{
+  display:flex;align-items:center;gap:7px;padding:7px 13px;
+  border:1px solid #e2e8f0;border-radius:99px;background:#f7f8fa;
+  font-size:13px;font-weight:500;color:#2d3748;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;white-space:nowrap;
+  font-family:inherit;
+}
+.kte-dd-btn:hover{border-color:#a0aec0;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+body.dark .kte-dd-btn{background:#232338;border-color:rgba(255,255,255,.1);color:#e2e8f0;}
+.kte-brand-dot{width:9px;height:9px;border-radius:50%;border:1.5px solid rgba(0,0,0,.15);flex-shrink:0;}
+.kte-dd-btn svg{width:13px;height:13px;opacity:.5;flex-shrink:0;}
+
+.kte-dd-menu{
+  position:absolute;top:calc(100% + 6px);left:0;min-width:max-content;
+  background:#fff;border:1px solid #e2e8f0;border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:100;overflow:hidden;display:none;
+}
+.kte-dd-menu.open{display:block;}
+body.dark .kte-dd-menu{background:#232338;border-color:rgba(255,255,255,.1);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.kte-dd-menu button{
+  display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;
+  border:none;background:none;text-align:left;font-size:13px;color:#2d3748;
+  cursor:pointer;transition:background .1s;white-space:nowrap;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.kte-dd-menu button:hover{background:#f7f8fa;}
+body.dark .kte-dd-menu button{color:#e2e8f0;}
+body.dark .kte-dd-menu button:hover{background:rgba(255,255,255,.06);}
+.kte-dd-menu button.cte-active{font-weight:700;}
+.b-dot{width:9px;height:9px;border-radius:50%;border:1.5px solid rgba(0,0,0,.15);flex-shrink:0;}
+.brand-current-tag{font-size:10px;color:#a0aec0;margin-left:auto;}
+
+/* === MODE TOGGLE (exact match) === */
+.kte-mode-toggle{
+  display:flex;align-items:center;
+  background:#f0f2f5;border-radius:99px;
+  padding:3px;gap:0;border:1px solid #e2e8f0;
+}
+body.dark .kte-mode-toggle{background:#0f1118;border-color:rgba(255,255,255,.1);}
+.kte-mode-btn{
+  padding:5px 13px;border-radius:99px;border:none;background:none;
+  font-size:13px;font-weight:500;color:#718096;cursor:pointer;
+  transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;
+  font-family:inherit;
+}
+.kte-mode-btn.cte-active{background:#fff;color:#1a202c;box-shadow:0 1px 4px rgba(0,0,0,.10);}
+body.dark .kte-mode-btn.cte-active{background:#2d2d4a;color:#f7fafc;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.kte-mode-btn .icon-solid{display:none;}
+.kte-mode-btn .icon-outline{display:inline;}
+.kte-mode-btn.cte-active .icon-outline{display:none;}
+.kte-mode-btn.cte-active .icon-solid{display:inline;}
+
+/* === COMPARE BUTTON (exact match) === */
+.kte-compare-btn{
+  display:flex;align-items:center;gap:6px;padding:7px 13px;
+  border:1.5px solid #e2e8f0;border-radius:99px;background:#f7f8fa;
+  font-size:13px;font-weight:500;color:#4a5568;cursor:pointer;
+  transition:all .15s;white-space:nowrap;font-family:inherit;
+}
+.kte-compare-btn:hover{border-color:#a0aec0;}
+.kte-compare-btn.on{background:#ebf4ff;border-color:#4299e1;color:#2b6cb0;}
+body.dark .kte-compare-btn{background:#232338;border-color:rgba(255,255,255,.1);color:#a0aec0;}
+body.dark .kte-compare-btn.on{background:#1a3352;border-color:#4299e1;color:#63b3ed;}
+.kte-compare-btn svg{width:14px;height:14px;}
+.kte-compare-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#4299e1;color:#fff;border-radius:99px;
+  font-size:10px;font-weight:700;min-width:17px;height:17px;padding:0 4px;
+}
+.kte-compare-dd{position:relative;}
+.kte-compare-menu{
+  position:absolute;top:calc(100% + 6px);left:0;min-width:230px;
+  background:#fff;border:1px solid #e2e8f0;border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:100;overflow:hidden;display:none;
+}
+.kte-compare-menu.open{display:block;}
+body.dark .kte-compare-menu{background:#232338;border-color:rgba(255,255,255,.1);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.compare-item{
+  display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;
+  border:none;background:none;cursor:pointer;font-size:13px;color:#2d3748;
+  transition:background .1s;user-select:none;text-align:left;font-family:inherit;
+}
+.compare-item:hover{background:#f7f8fa;}
+.compare-item.locked{cursor:default;}
+.compare-item.locked:hover{background:none;}
+body.dark .compare-item{color:#e2e8f0;}
+body.dark .compare-item:hover{background:rgba(255,255,255,.06);}
+body.dark .compare-item.locked:hover{background:none;}
+.cte-check-box{
+  width:16px;height:16px;border-radius:4px;border:1.5px solid #cbd5e0;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .1s;
+}
+.compare-item.checked .cte-check-box{background:#3182ce;border-color:#3182ce;}
+.compare-item.locked.checked .cte-check-box{background:#4299e1;border-color:#4299e1;}
+.cte-compare-current-tag{font-size:10px;color:#a0aec0;margin-left:auto;}
+
+/* === ICON BUTTONS (exact match) === */
+.cte-icon-btn{
+  width:32px;height:32px;border-radius:8px;border:1px solid #e2e8f0;
+  background:#f7f8fa;color:#a0aec0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.cte-icon-btn:hover,.cte-icon-btn.cte-active{border-color:#a0aec0;color:#2d3748;background:#edf2f7;}
+.cte-icon-btn svg{width:14px;height:14px;}
+body.dark .cte-icon-btn{background:#232338;border-color:rgba(255,255,255,.1);color:#718096;}
+body.dark .cte-icon-btn:hover{background:rgba(255,255,255,.08);color:#e2e8f0;border-color:rgba(255,255,255,.2);}
+#btn-toggle-all svg{transition:transform .2s;}
+#btn-toggle-all.all-open svg{transform:rotate(180deg);}
+
+/* === INPUT BAR === */
+.kte-input-bar{
+  display:flex;align-items:center;gap:12px;padding:10px 20px;
+  border-bottom:1px solid #e2e8f0;background:#f7f8fa;
+}
+body.dark .kte-input-bar{background:#141424;border-color:rgba(255,255,255,.08);}
+.kte-input-label{
+  font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;
+  letter-spacing:.06em;flex-shrink:0;
+}
+.kte-input-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.kte-preview-input{
+  flex:1;min-width:0;height:32px;padding:0 10px;
+  border:1px solid #e2e8f0;border-radius:8px;background:#fff;
+  color:#1a202c;font-family:inherit;font-size:13px;font-weight:500;
+  outline:none;transition:border-color .15s;
+}
+.kte-preview-input:focus{border-color:#a0aec0;box-shadow:0 0 0 2px rgba(160,174,192,.2);}
+.kte-preview-input::placeholder{color:#cbd5e0;}
+body.dark .kte-preview-input{background:#232338;border-color:rgba(255,255,255,.1);color:#e2e8f0;}
+body.dark .kte-preview-input::placeholder{color:#4a5568;}
+.kte-char-count{font-size:11px;color:#a0aec0;flex-shrink:0;font-variant-numeric:tabular-nums;}
+.kte-char-count.near{color:#d97706;}
+.kte-char-count.full{color:#dc2626;}
+
+/* === SECTIONS (match .cte-groups/.cte-group) === */
+.kte-groups{padding:0 20px;}
+.kte-group{border-bottom:1px solid #e2e8f0;}
+.kte-group:last-child{border-bottom:none;}
+body.dark .kte-group{border-color:rgba(255,255,255,.08);}
+.kte-group-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 0;cursor:pointer;user-select:none;
+}
+.kte-group-hdr:hover .kte-gh-label{color:#1a202c;}
+body.dark .kte-group-hdr:hover .kte-gh-label{color:#f7fafc;}
+.kte-gh-left{display:flex;align-items:center;gap:10px;}
+.kte-gh-label{font-size:14px;font-weight:500;color:#4a5568;transition:color .15s;}
+body.dark .kte-gh-label{color:#a0aec0;}
+.kte-gh-note{font-size:11.5px;color:#a0aec0;}
+.kte-gh-chevron{width:15px;height:15px;color:#a0aec0;transition:transform .2s;flex-shrink:0;}
+.kte-group.open .kte-gh-chevron{transform:rotate(180deg);}
+.kte-group-body{display:none;padding-bottom:16px;}
+.kte-group.open .kte-group-body{display:block;}
+
+/* === SINGLE BRAND ROWS === */
+.kte-row{
+  display:flex;align-items:flex-start;gap:0;
+  padding:12px 0;border-bottom:1px solid #f0f2f5;
+  transition:background .1s;
+}
+.kte-row:last-child{border-bottom:none;}
+.kte-row:hover{background:#fafbfc;margin:0 -20px;padding-left:20px;padding-right:20px;}
+body.dark .kte-row{border-color:rgba(255,255,255,.05);}
+body.dark .kte-row:hover{background:rgba(255,255,255,.03);}
+
+.kte-level-badge{
+  flex-shrink:0;width:38px;font-size:10px;font-weight:700;color:#a0aec0;
+  font-family:'SF Mono','Fira Mono',monospace;padding-top:3px;letter-spacing:.04em;
+}
+.kte-preview-area{flex:1;min-width:0;}
+.kte-preview-text{word-break:break-word;color:#1a202c;transition:color .2s;}
+body.dark .kte-preview-text{color:#f7fafc;}
+
+/* Spec row */
+.kte-spec-row{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.kte-spec-text{font-size:11.5px;color:#718096;}
+body.dark .kte-spec-text{color:#718096;}
+.kte-spec-copy{
+  width:22px;height:22px;border-radius:5px;border:1px solid #e2e8f0;
+  background:#f7f8fa;cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;color:#a0aec0;opacity:0;transition:opacity .15s,background .1s;
+  flex-shrink:0;position:relative;font-family:inherit;
+}
+.kte-row:hover .kte-spec-copy{opacity:1;}
+.kte-spec-copy:hover{background:#edf2f7;color:#2d3748;}
+.kte-spec-copy.copied{background:#c6f6d5;border-color:#9ae6b4;color:#276749;opacity:1;}
+.kte-spec-copy.copied::after{
+  content:'Copied!';position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#276749;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;
+  border-radius:4px;white-space:nowrap;z-index:50;pointer-events:none;
+}
+
+/* Token tag (match .lt-chip from color explorer) */
+.kte-token-row{display:flex;align-items:center;gap:6px;margin-top:5px;}
+.kte-token-tag{
+  display:inline-flex;align-items:center;gap:5px;max-width:100%;min-width:0;
+}
+.kte-token-chip{
+  display:inline-block;padding:2px 8px;border-radius:99px;
+  background:#f0f2f5;border:1px solid #e2e8f0;
+  font-size:10.5px;font-family:'SF Mono','Fira Mono',monospace;color:#4a5568;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px;
+}
+body.dark .kte-token-chip{background:#232338;border-color:rgba(255,255,255,.1);color:#a0aec0;}
+.kte-token-copy{
+  width:22px;height:22px;border-radius:5px;border:1px solid #e2e8f0;
+  background:#f7f8fa;cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;color:#a0aec0;opacity:0;transition:opacity .15s,background .1s;
+  flex-shrink:0;position:relative;font-family:inherit;
+}
+.kte-row:hover .kte-token-copy{opacity:1;}
+.kte-token-copy:hover{background:#edf2f7;color:#2d3748;}
+.kte-token-copy.copied{background:#c6f6d5;border-color:#9ae6b4;color:#276749;opacity:1;}
+.kte-token-copy.copied::after{
+  content:'Copied!';position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#276749;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;
+  border-radius:4px;white-space:nowrap;z-index:50;pointer-events:none;
+}
+
+/* === COMPARE MODE === */
+.kte-compare-wrap{overflow-x:auto;}
+.kte-compare-wrap::-webkit-scrollbar{height:4px;}
+.kte-compare-wrap::-webkit-scrollbar-track{background:transparent;}
+.kte-compare-wrap::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px;}
+
+.kte-cmp-head-row{
+  display:flex;align-items:center;padding:8px 0 6px;
+  border-bottom:1px solid #e2e8f0;
+  min-width:0;
+}
+body.dark .kte-cmp-head-row{border-color:rgba(255,255,255,.08);}
+.kte-cmp-head-spacer{flex-shrink:0;width:38px;}
+.kte-cmp-head-brand{
+  flex:1;min-width:160px;
+  font-size:10px;font-weight:700;color:#a0aec0;
+  text-transform:uppercase;letter-spacing:.06em;padding:0 12px;
+  display:flex;align-items:center;gap:5px;
+}
+
+.kte-cmp-row{
+  display:flex;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid #f0f2f5;
+}
+.kte-cmp-row:last-child{border-bottom:none;}
+body.dark .kte-cmp-row{border-color:rgba(255,255,255,.05);}
+.kte-cmp-level{
+  flex-shrink:0;width:38px;
+  font-size:10px;font-weight:700;color:#a0aec0;
+  font-family:'SF Mono','Fira Mono',monospace;padding-top:4px;
+}
+.kte-cmp-cell{
+  flex:1;min-width:160px;padding:0 12px;
+  border-right:1px solid #f0f2f5;position:relative;
+}
+.kte-cmp-cell:last-child{border-right:none;}
+body.dark .kte-cmp-cell{border-color:rgba(255,255,255,.05);}
+.kte-cmp-preview{word-break:break-word;color:#1a202c;}
+body.dark .kte-cmp-preview{color:#f7fafc;}
+.kte-cmp-spec-row{display:flex;align-items:center;gap:5px;margin-top:4px;}
+.kte-cmp-spec-text{font-size:11px;color:#718096;}
+.kte-cmp-copy{
+  width:20px;height:20px;border-radius:4px;border:1px solid #e2e8f0;
+  background:#f7f8fa;cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;color:#a0aec0;opacity:0;transition:opacity .15s;
+  flex-shrink:0;position:relative;font-family:inherit;
+}
+.kte-cmp-cell:hover .kte-cmp-copy{opacity:1;}
+.kte-cmp-copy:hover{background:#edf2f7;color:#2d3748;}
+.kte-cmp-copy.copied{background:#c6f6d5;border-color:#9ae6b4;color:#276749;opacity:1;}
+.kte-cmp-copy.copied::after{
+  content:'Copied!';position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#276749;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;
+  border-radius:4px;white-space:nowrap;z-index:50;pointer-events:none;
+}
+
+/* Compact token chip for compare cells */
+.kte-cmp-token{
+  display:inline-block;margin-top:5px;padding:1px 7px;border-radius:99px;
+  background:#f0f2f5;border:1px solid #e2e8f0;
+  font-size:9.5px;font-family:'SF Mono','Fira Mono',monospace;color:#718096;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;
+}
+body.dark .kte-cmp-token{background:#232338;border-color:rgba(255,255,255,.1);color:#718096;}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <div class="page-title">Typography Scale Explorer</div>
+  <div class="page-sub">Kaleido Design System · 5 brands · Heading &amp; Paragraph scales</div>
+  <div id="kte"></div>
+</div>
+
+<script>
+// ── Embed mode ──
+(function(){
+  const inIframe=(function(){try{return window.self!==window.top;}catch(e){return true;}})();
+  const hasParam=new URLSearchParams(window.location.search).has('embed');
+  if(inIframe||hasParam)document.body.classList.add('embed-mode');
+})();
+
+// ── Brand config ──
+const BRAND_KEYS   = ['Reliant','DE','GME','DP','Cirro'];
+const BRAND_COLORS = { Reliant:'#0097D0', DE:'#FFA440', GME:'#28B574', DP:'#004C97', Cirro:'#1AC0FF' };
+const BRAND_LABELS = { Reliant:'Reliant', DE:'DE (Direct Energy)', GME:'GME (Green Mountain)', DP:'DP (Discount Power)', Cirro:'Cirro' };
+
+const FONTS = {
+  Reliant:{ primary:"Effra,'Trebuchet MS',sans-serif",         pName:'Effra',        secondary:null,              sName:null    },
+  DE:     { primary:"'Basic Sans',Inter,sans-serif",            pName:'Basic Sans',   secondary:"Inter,sans-serif", sName:'Inter' },
+  GME:    { primary:"Montserrat,sans-serif",                    pName:'Montserrat',   secondary:null,              sName:null    },
+  DP:     { primary:"'Josefin Sans',sans-serif",                pName:'Josefin Sans', secondary:null,              sName:null    },
+  Cirro:  { primary:"Lato,sans-serif",                          pName:'Lato',         secondary:null,              sName:null    },
+};
+
+// Token data — values from Kaleido design system documentation
+// DE: Basic Sans H1–H3, Inter H4–H6 and all paragraphs (sec:true)
+// GME, DP, Cirro share identical size scale
+const TOKENS = {
+  Reliant:{
+    H1:{ size:26, lh:30, ls:0,    weight:700, wl:'Bold',     sec:false },
+    H2:{ size:22, lh:28, ls:0,    weight:500, wl:'Medium',   sec:false },
+    H3:{ size:18, lh:22, ls:0,    weight:400, wl:'Regular',  sec:false },
+    H4:{ size:16, lh:22, ls:0,    weight:700, wl:'Bold',     sec:false },
+    H5:{ size:14, lh:18, ls:0,    weight:500, wl:'Medium',   sec:false },
+    H6:{ size:13, lh:16, ls:0,    weight:500, wl:'Medium',   sec:false },
+    P1:{ size:13, lh:18, ls:0,    weight:400, wl:'Regular',  sec:false },
+    P2:{ size:11, lh:15, ls:0,    weight:400, wl:'Regular',  sec:false },
+    P3:{ size:11, lh:15, ls:0,    weight:400, wl:'Regular',  sec:false },
+    P4:{ size:9,  lh:12, ls:0,    weight:400, wl:'Regular',  sec:false },
+  },
+  DE:{
+    H1:{ size:28, lh:38, ls:0.15, weight:700, wl:'Bold',     sec:false },
+    H2:{ size:24, lh:32, ls:0.15, weight:700, wl:'Bold',     sec:false },
+    H3:{ size:20, lh:28, ls:0.15, weight:700, wl:'Bold',     sec:false },
+    H4:{ size:16, lh:24, ls:0.15, weight:600, wl:'SemiBold', sec:true  },
+    H5:{ size:16, lh:24, ls:0.5,  weight:600, wl:'SemiBold', sec:true  },
+    H6:{ size:16, lh:29, ls:0.5,  weight:600, wl:'SemiBold', sec:true  },
+    P1:{ size:14, lh:20, ls:0.25, weight:400, wl:'Regular',  sec:true  },
+    P2:{ size:14, lh:22, ls:0.25, weight:400, wl:'Regular',  sec:true  },
+    P3:{ size:12, lh:18, ls:0.15, weight:400, wl:'Regular',  sec:true  },
+    P4:{ size:10, lh:16, ls:0.25, weight:400, wl:'Regular',  sec:true  },
+  },
+  GME:{
+    H1:{ size:24, lh:30, ls:0, weight:700, wl:'Bold',     sec:false },
+    H2:{ size:20, lh:26, ls:0, weight:700, wl:'Bold',     sec:false },
+    H3:{ size:16, lh:22, ls:0, weight:700, wl:'Bold',     sec:false },
+    H4:{ size:14, lh:20, ls:0, weight:600, wl:'SemiBold', sec:false },
+    H5:{ size:12, lh:18, ls:0, weight:600, wl:'SemiBold', sec:false },
+    H6:{ size:12, lh:16, ls:0, weight:700, wl:'Bold',     sec:false },
+    P1:{ size:14, lh:20, ls:0, weight:400, wl:'Regular',  sec:false },
+    P2:{ size:12, lh:18, ls:0, weight:400, wl:'Regular',  sec:false },
+    P3:{ size:12, lh:18, ls:0, weight:400, wl:'Regular',  sec:false },
+    P4:{ size:9,  lh:14, ls:0, weight:400, wl:'Regular',  sec:false },
+  },
+  DP:{
+    H1:{ size:24, lh:30, ls:0, weight:700, wl:'Bold',     sec:false },
+    H2:{ size:20, lh:26, ls:0, weight:700, wl:'Bold',     sec:false },
+    H3:{ size:16, lh:22, ls:0, weight:700, wl:'Bold',     sec:false },
+    H4:{ size:14, lh:20, ls:0, weight:600, wl:'SemiBold', sec:false },
+    H5:{ size:12, lh:18, ls:0, weight:600, wl:'SemiBold', sec:false },
+    H6:{ size:12, lh:16, ls:0, weight:700, wl:'Bold',     sec:false },
+    P1:{ size:14, lh:20, ls:0, weight:400, wl:'Regular',  sec:false },
+    P2:{ size:12, lh:18, ls:0, weight:400, wl:'Regular',  sec:false },
+    P3:{ size:12, lh:18, ls:0, weight:400, wl:'Regular',  sec:false },
+    P4:{ size:9,  lh:14, ls:0, weight:400, wl:'Regular',  sec:false },
+  },
+  Cirro:{
+    H1:{ size:24, lh:30, ls:0, weight:700, wl:'Bold',     sec:false },
+    H2:{ size:18, lh:24, ls:0, weight:700, wl:'Bold',     sec:false },
+    H3:{ size:16, lh:22, ls:0, weight:700, wl:'Bold',     sec:false },
+    H4:{ size:14, lh:20, ls:0, weight:600, wl:'SemiBold', sec:false },
+    H5:{ size:12, lh:18, ls:0, weight:600, wl:'SemiBold', sec:false },
+    H6:{ size:12, lh:16, ls:0, weight:700, wl:'Bold',     sec:false },
+    P1:{ size:14, lh:20, ls:0, weight:400, wl:'Regular',  sec:false },
+    P2:{ size:12, lh:18, ls:0, weight:400, wl:'Regular',  sec:false },
+    P3:{ size:12, lh:18, ls:0, weight:400, wl:'Regular',  sec:false },
+    P4:{ size:9,  lh:14, ls:0, weight:400, wl:'Regular',  sec:false },
+  },
+};
+
+const H_LEVELS  = ['H1','H2','H3','H4','H5','H6'];
+const P_LEVELS  = ['P1','P2','P3','P4'];
+const MAX_CHARS = 40;
+const DEF_TEXT  = 'The quick brown fox';
+
+const S = {
+  brand:'Reliant', mode:'light',
+  compare:false, compareBrands:['Reliant'],
+  groups:{ heading:true, paragraph:true },
+  previewText: DEF_TEXT,
+  allOpen: true,
+};
+
+// ── Helpers ──
+function getFam(b,l){ const f=FONTS[b],t=TOKENS[b][l]; return (t.sec&&f.secondary)?f.secondary:f.primary; }
+function getFamName(b,l){ const f=FONTS[b],t=TOKENS[b][l]; return (t.sec&&f.sName)?f.sName:f.pName; }
+function getTokenPath(l){
+  const type=H_LEVELS.includes(l)?'heading':'paragraph';
+  return `semantic-layer/text/styles/${type}/${l.toLowerCase()}`;
+}
+function buildSpecText(b,l){
+  const t=TOKENS[b][l],nm=getFamName(b,l);
+  return `${nm} · ${t.size}/${t.lh}px · ${t.wl}${t.ls?` · ${t.ls}ls`:''}`;
+}
+function buildSpecCopy(b,l){
+  const t=TOKENS[b][l],nm=getFamName(b,l);
+  return `Font Family: ${nm}\nSize: ${t.size}\nLine Height: ${t.lh}\nWeight: ${t.wl} (${t.weight})${t.ls?`\nLetter Spacing: ${t.ls}`:''}`;
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Copy ──
+function _doCopy(text){
+  (navigator.clipboard?navigator.clipboard.writeText(text):Promise.reject())
+    .catch(()=>{ const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta); });
+}
+function doCopy(btn,text){
+  _doCopy(text);btn.classList.add('copied');
+  setTimeout(()=>btn.classList.remove('copied'),1300);
+}
+
+// ── Icons ──
+const COPY_ICO=`<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="7" height="7" rx="1.5"/><path d="M4 9H3a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 3 1h5A1.5 1.5 0 0 1 9.5 2.5V3.5"/></svg>`;
+const CHECK_ICO=`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const CARET=`<svg viewBox="0 0 13 13" fill="none"><path d="M2.5 4.5l3.5 4 3.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+// ── Render header ──
+function renderHeader(){
+  const dot=BRAND_COLORS[S.brand];
+  const allGroupsOpen=Object.values(S.groups).every(Boolean);
+  const cmpCount=S.compare?S.compareBrands.length:0;
+
+  const brandOpts=BRAND_KEYS.map(b=>`
+    <button onclick="setBrand('${b}')"${b===S.brand&&!S.compare?' class="cte-active"':''}>
+      <span class="b-dot" style="background:${BRAND_COLORS[b]};"></span>
+      ${BRAND_LABELS[b]}
+      ${b===S.brand&&!S.compare?'<span class="brand-current-tag" style="margin-left:auto;font-size:10px;color:#a0aec0;">current</span>':''}
+    </button>`).join('');
+
+  const cmpItems=BRAND_KEYS.map(b=>{
+    const isChecked=S.compareBrands.includes(b);
+    const isLocked=isChecked&&S.compareBrands.length<=1;
+    return `<button class="compare-item${isChecked?' checked':''}${isLocked?' locked':''}" onclick="toggleCmpBrand('${b}')">
+      <div class="cte-check-box">${isChecked?CHECK_ICO:''}</div>
+      <span class="b-dot" style="background:${BRAND_COLORS[b]};"></span>
+      ${BRAND_LABELS[b]}
+      ${b===S.brand&&!S.compare?'<span class="cte-compare-current-tag">current</span>':''}
+    </button>`;
+  }).join('');
+
+  return `
+    <div class="kte-header" id="kte-header">
+      <div class="kte-header-left">
+        <div class="kte-dd" id="dd-brand">
+          <button class="kte-dd-btn" onclick="ddToggle('brand')">
+            <span class="kte-brand-dot" style="background:${dot};"></span>
+            <span id="lbl-brand">${S.compare?'Compare':S.brand}</span>
+            ${CARET}
+          </button>
+          <div class="kte-dd-menu" id="menu-brand">${brandOpts}</div>
+        </div>
+        <div class="kte-mode-toggle">
+          <button class="kte-mode-btn${S.mode==='light'?' cte-active':''}" onclick="setMode('light')">
+            <svg class="icon-outline" width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M3.05 3.05l1.06 1.06M9.89 9.89l1.06 1.06M10.95 3.05l-1.06 1.06M4.11 9.89l-1.06 1.06" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <svg class="icon-solid" width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" fill="currentColor"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M3.05 3.05l1.06 1.06M9.89 9.89l1.06 1.06M10.95 3.05l-1.06 1.06M4.11 9.89l-1.06 1.06" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Light
+          </button>
+          <button class="kte-mode-btn${S.mode==='dark'?' cte-active':''}" onclick="setMode('dark')">
+            <svg class="icon-outline" width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9.55 3.04A5 5 0 1 0 9.55 10.96A4 4 0 1 1 9.55 3.04Z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+            <svg class="icon-solid" width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9.55 3.04A5 5 0 1 0 9.55 10.96A4 4 0 1 1 9.55 3.04Z" fill="currentColor"/></svg>
+            Dark
+          </button>
+        </div>
+        <div class="kte-compare-dd" id="dd-compare">
+          <button class="kte-compare-btn${S.compare?' on':''}" onclick="ddToggle('compare')">
+            <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="4.5" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8.5" y="3" width="4.5" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 7h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Compare
+            ${cmpCount>1?`<span class="kte-compare-count">${cmpCount}</span>`:''}
+            <svg viewBox="0 0 13 13" fill="none" style="width:11px;height:11px;opacity:.5;"><path d="M2.5 4.5l3.5 4 3.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="kte-compare-menu" id="menu-compare">${cmpItems}</div>
+        </div>
+      </div>
+      <div class="kte-header-right">
+        <button class="cte-icon-btn${allGroupsOpen?' all-open':''}" id="btn-toggle-all" title="${allGroupsOpen?'Collapse all':'Expand all'}" onclick="toggleAll()">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M2 5l5 5 5-5M2 2h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+// ── Render input bar ──
+function renderInputBar(){
+  const len=S.previewText.length;
+  const cls=len>=MAX_CHARS?'full':len>=MAX_CHARS-8?'near':'';
+  return `
+    <div class="kte-input-bar">
+      <span class="kte-input-label">Preview text</span>
+      <div class="kte-input-wrap">
+        <input class="kte-preview-input" id="preview-input" type="text"
+          maxlength="${MAX_CHARS}" placeholder="${DEF_TEXT}"
+          value="${esc(S.previewText)}" oninput="updatePreview(this.value)">
+        <span class="kte-char-count ${cls}" id="char-count">${len}/${MAX_CHARS}</span>
+      </div>
+    </div>`;
+}
+
+// ── Render single-brand row ──
+function renderSingleRow(level){
+  const t=TOKENS[S.brand][level];
+  const fam=getFam(S.brand,level);
+  const lsStyle=t.ls?`letter-spacing:${t.ls}px;`:'';
+  const text=S.previewText||DEF_TEXT;
+  const specCopy=buildSpecCopy(S.brand,level);
+  const specText=buildSpecText(S.brand,level);
+  const tokenPath=getTokenPath(level);
+  return `
+    <div class="kte-row">
+      <div class="kte-level-badge">${level}</div>
+      <div class="kte-preview-area">
+        <div class="kte-preview-text" style="font-family:${fam};font-size:${t.size}px;line-height:${t.lh}px;font-weight:${t.weight};${lsStyle}">${esc(text)}</div>
+        <div class="kte-spec-row">
+          <span class="kte-spec-text">${specText}</span>
+          <button class="kte-spec-copy" onclick='doCopy(this,${JSON.stringify(specCopy)})' title="Copy spec">${COPY_ICO}</button>
+        </div>
+        <div class="kte-token-row">
+          <div class="kte-token-tag">
+            <span class="kte-token-chip">${tokenPath}</span>
+            <button class="kte-token-copy" onclick='doCopy(this,${JSON.stringify(tokenPath)})' title="Copy token path">${COPY_ICO}</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Render compare ──
+function renderCompare(levels){
+  const brands=S.compareBrands.length?S.compareBrands:[S.brand];
+  const text=S.previewText||DEF_TEXT;
+
+  const headBrands=brands.map(b=>`
+    <div class="kte-cmp-head-brand">
+      <span class="b-dot" style="background:${BRAND_COLORS[b]};border:1.5px solid rgba(0,0,0,.15);"></span>
+      ${b}
+    </div>`).join('');
+
+  const rows=levels.map(level=>{
+    const cells=brands.map(b=>{
+      const t=TOKENS[b][level];
+      const fam=getFam(b,level);
+      const lsStyle=t.ls?`letter-spacing:${t.ls}px;`:'';
+      const specCopy=buildSpecCopy(b,level);
+      const specText=buildSpecText(b,level);
+      const tokenPath=getTokenPath(level);
+      return `
+        <div class="kte-cmp-cell">
+          <div class="kte-cmp-preview" style="font-family:${fam};font-size:${t.size}px;line-height:${t.lh}px;font-weight:${t.weight};${lsStyle}">${esc(text)}</div>
+          <div class="kte-cmp-spec-row">
+            <span class="kte-cmp-spec-text">${specText}</span>
+            <button class="kte-cmp-copy" onclick='doCopy(this,${JSON.stringify(specCopy)})' title="Copy spec">${COPY_ICO}</button>
+          </div>
+          <div class="kte-cmp-token">${tokenPath}</div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="kte-cmp-row">
+        <div class="kte-cmp-level">${level}</div>
+        ${cells}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="kte-compare-wrap">
+      <div class="kte-cmp-head-row">
+        <div class="kte-cmp-head-spacer"></div>
+        ${headBrands}
+      </div>
+      ${rows}
+    </div>`;
+}
+
+// ── Render group ──
+function renderGroup(type,levels,label,note){
+  const isOpen=S.groups[type];
+  const body=S.compare&&S.compareBrands.length>1
+    ?renderCompare(levels)
+    :levels.map(renderSingleRow).join('');
+  return `
+    <div class="kte-group${isOpen?' open':''}" id="grp-${type}">
+      <div class="kte-group-hdr" onclick="toggleGroup('${type}')">
+        <div class="kte-gh-left">
+          <svg class="kte-gh-folder" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 4a1 1 0 011-1h3.5l1.5 1.5h5.5a1 1 0 011 1V12a1 1 0 01-1 1H2.5a1 1 0 01-1-1V4z" stroke="currentColor" stroke-width="1.3" style="color:#a0aec0"/></svg>
+          <span class="kte-gh-label">${label}</span>
+          <span class="kte-gh-note">${note}</span>
+        </div>
+        <svg class="kte-gh-chevron" viewBox="0 0 13 13" fill="none"><path d="M2.5 4.5l3.5 4 3.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="kte-group-body">${body}</div>
+    </div>`;
+}
+
+// ── Main render ──
+function render(){
+  document.getElementById('kte').innerHTML=
+    renderHeader()+
+    renderInputBar()+
+    `<div class="kte-groups">`+
+    renderGroup('heading',H_LEVELS,'Heading Scale','H1–H6')+
+    renderGroup('paragraph',P_LEVELS,'Paragraph Scale','P1–P4')+
+    `</div>`;
+}
+
+// ── State handlers ──
+function setBrand(b){
+  S.brand=b;S.compare=false;S.compareBrands=[b];
+  closeAllDrops();render();
+}
+function setMode(m){
+  S.mode=m;
+  document.body.classList.toggle('dark',m==='dark');
+  render();
+}
+function toggleGroup(type){
+  S.groups[type]=!S.groups[type];
+  const grp=document.getElementById('grp-'+type);
+  if(grp){grp.classList.toggle('open',S.groups[type]);}
+  const btn=document.getElementById('btn-toggle-all');
+  if(btn){
+    const allOpen=Object.values(S.groups).every(Boolean);
+    btn.classList.toggle('all-open',allOpen);
+    btn.title=allOpen?'Collapse all':'Expand all';
+  }
+}
+function toggleAll(){
+  const allOpen=Object.values(S.groups).every(Boolean);
+  Object.keys(S.groups).forEach(k=>S.groups[k]=!allOpen);
+  render();
+}
+function updatePreview(val){
+  S.previewText=val;
+  document.querySelectorAll('.kte-preview-text,.kte-cmp-preview').forEach(el=>el.textContent=val||DEF_TEXT);
+  const cc=document.getElementById('char-count');
+  if(cc){
+    cc.textContent=`${val.length}/${MAX_CHARS}`;
+    cc.className='kte-char-count'+(val.length>=MAX_CHARS?' full':val.length>=MAX_CHARS-8?' near':'');
+  }
+}
+function toggleCmpBrand(brand){
+  const idx=S.compareBrands.indexOf(brand);
+  if(idx>-1){
+    if(S.compareBrands.length<=1)return;
+    S.compareBrands.splice(idx,1);
+  } else {
+    S.compareBrands.push(brand);
+  }
+  S.compare=S.compareBrands.length>1;
+  render();
+  // Re-open compare dropdown
+  const m=document.getElementById('menu-compare');
+  if(m)m.classList.add('open');
+}
+function ddToggle(which){
+  const menuId=which==='brand'?'menu-brand':'menu-compare';
+  const otherId=which==='brand'?'menu-compare':'menu-brand';
+  const menu=document.getElementById(menuId);
+  const other=document.getElementById(otherId);
+  if(other)other.classList.remove('open');
+  if(menu)menu.classList.toggle('open');
+}
+function closeAllDrops(){
+  ['menu-brand','menu-compare'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.remove('open');
+  });
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#dd-brand')&&!e.target.closest('#dd-compare')){
+    closeAllDrops();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
